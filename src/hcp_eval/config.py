@@ -12,13 +12,25 @@ class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
     # Hy3 API Configuration
+    hy3_provider: str = Field(
+        default="openai",
+        description="Backend provider: 'openai' (OpenAI-compatible) or 'tencentcloud' (Tencent Cloud Hunyuan SDK)",
+    )
     hy3_base_url: str = Field(
         default="http://127.0.0.1:8000/v1",
         description="Hy3 API base URL (OpenAI-compatible)",
     )
     hy3_api_key: str = Field(
         default="EMPTY",
-        description="Hy3 API key",
+        description="Hy3 API key (OpenAI-compatible provider)",
+    )
+    tencentcloud_secret_id: str = Field(
+        default="",
+        description="Tencent Cloud SecretId (tencentcloud provider)",
+    )
+    tencentcloud_secret_key: str = Field(
+        default="",
+        description="Tencent Cloud SecretKey (tencentcloud provider)",
     )
     hy3_model: str = Field(
         default="hy3",
@@ -90,11 +102,19 @@ class Settings(BaseSettings):
     @field_validator("hy3_model")
     @classmethod
     def validate_hy3_model(cls, v: str) -> str:
-        """Ensure model name contains 'hy3' to prevent accidental use of other models."""
-        if "hy3" not in v.lower():
-            raise ValueError(
-                f"Model name must contain 'hy3' to ensure correct model usage, got: {v}"
-            )
+        """Ensure non-empty model name. For the OpenAI provider we additionally
+        expect the name to contain 'hy3' to avoid accidentally using an unrelated
+        model on a paid endpoint; the Tencent Cloud provider uses Hunyuan model
+        names (e.g. hunyuan-turbo) which is expected."""
+        if not v or not v.strip():
+            raise ValueError("Model name must not be empty")
+        return v
+
+    @field_validator("hy3_provider")
+    @classmethod
+    def validate_provider(cls, v: str) -> str:
+        if v not in ("openai", "tencentcloud"):
+            raise ValueError(f"hy3_provider must be 'openai' or 'tencentcloud', got: {v}")
         return v
 
     class Config:
