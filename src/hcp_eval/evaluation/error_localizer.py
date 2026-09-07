@@ -14,6 +14,7 @@ from ..schemas import (
     SolutionRecord,
 )
 from ..execution import SandboxRunner, run_sbfl_analysis
+from ..code_utils import prepare_function_code
 from .ast_checker import ASTChecker
 from .rule_checker import RuleChecker
 from .evidence_merger import EvidenceMerger
@@ -53,16 +54,20 @@ class ErrorLocalizer:
         all_evidence: list[EvidenceRecord] = []
 
         # Phase 1: Execute base tests
+        base_code = prepare_function_code(solution.code, problem.entry_point)
         logger.info("[%s] Running %d base tests...", problem.task_id, len(problem.base_tests))
         base_results = self.sandbox.run_all_tests(
-            solution.code, problem.base_tests, problem.entry_point
+            base_code, problem.base_tests, problem.entry_point
         )
         base_passed = all(r.passed for r in base_results)
 
-        # Phase 2: Execute plus tests
+        # Phase 2: Execute plus tests (with oracle for comparison)
+        plus_code = prepare_function_code(
+            solution.code, problem.entry_point, problem.oracle_code
+        )
         logger.info("[%s] Running %d plus tests...", problem.task_id, len(problem.plus_tests))
         plus_results = self.sandbox.run_all_tests(
-            solution.code, problem.plus_tests, problem.entry_point
+            plus_code, problem.plus_tests, problem.entry_point
         )
         plus_passed = all(r.passed for r in plus_results)
 
@@ -85,7 +90,7 @@ class ErrorLocalizer:
         if collect_coverage_data and (problem.plus_tests or problem.base_tests):
             logger.info("[%s] Running SBFL analysis...", problem.task_id)
             suspect_lines, sbfl_evidence = run_sbfl_analysis(
-                function_code=solution.code,
+                function_code=plus_code,
                 base_tests=problem.base_tests,
                 plus_tests=problem.plus_tests,
                 base_results=base_results,

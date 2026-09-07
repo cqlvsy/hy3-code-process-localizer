@@ -1,0 +1,15 @@
+# Core runtime dependencies
+openai>=1.0.0
+datasets>=2.14.0
+evalplus>=0.3.0
+coverage>=7.0.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+rich>=13.0.0
+click>=8.1.0
+
+# Optional: demo dashboard
+# streamlit>=1.28.0
+
+# Dev / testing
+# pytest>=7.0.0

@@ -59,7 +59,9 @@ class Hy3Client:
         content = response.choices[0].message.content or ""
         return content, latency_ms
 
-    def generate_solution(self, problem_prompt: str, entry_point: str) -> SolutionRecord:
+    def generate_solution(
+        self, problem_prompt: str, entry_point: str, task_id: str = "unknown"
+    ) -> SolutionRecord:
         """Generate a complete S1-S7 solution for a coding problem."""
         from .prompt_builder import build_solver_prompt
 
@@ -69,7 +71,7 @@ class Hy3Client:
 
         from .parser import parse_solution_response
 
-        solution = parse_solution_response(raw_response, task_id=entry_point)
+        solution = parse_solution_response(raw_response, task_id=task_id)
         solution.raw_response = raw_response
         solution.generation_time_ms = latency_ms
 

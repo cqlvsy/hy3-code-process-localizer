@@ -89,6 +89,10 @@ class ProblemSpec(BaseModel):
     plus_tests: list[str] = Field(
         default_factory=list, description="Enhanced test assertions (EvalPlus)"
     )
+    oracle_code: Optional[str] = Field(
+        default=None,
+        description="Canonical solution renamed as oracle, used to evaluate plus tests",
+    )
     clauses: list[Clause] = Field(
         default_factory=list, description="Extracted specification clauses"
     )

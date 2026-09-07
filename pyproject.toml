@@ -1,6 +1,6 @@
 [build-system]
 requires = ["setuptools>=68.0", "wheel"]
-build-backend = "setuptools.backends._legacy:_Backend"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "hy3-code-process-localizer"
@@ -10,7 +10,7 @@ readme = "README.md"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.10"
 authors = [
-    {name = "cqlvsy", email = ""}
+    {name = "cqlvsy"}
 ]
 keywords = ["hy3", "hunyuan", "code-evaluation", "error-localization", "process-assessment", "llm"]
 classifiers = [
@@ -27,7 +27,7 @@ classifiers = [
 dependencies = [
     "openai>=1.0.0",
     "datasets>=2.14.0",
-    "evalplus>=0.23.0",
+    "evalplus>=0.3.0",
     "coverage>=7.0.0",
     "pydantic>=2.0.0",
     "rich>=13.0.0",

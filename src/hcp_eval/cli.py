@@ -74,7 +74,9 @@ def run(
         if hy3_client:
             try:
                 click.echo(f"  Generating solution with Hy3...")
-                solution = hy3_client.generate_solution(problem.prompt, problem.entry_point)
+                solution = hy3_client.generate_solution(
+                    problem.prompt, problem.entry_point, task_id=problem.task_id
+                )
                 if solution.parse_error:
                     click.echo(f"  WARNING: Parse error: {solution.parse_error}")
                     # Fall back to canonical solution
