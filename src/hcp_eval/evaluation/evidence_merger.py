@@ -140,11 +140,15 @@ class EvidenceMerger:
             and STEP_ORDER.get(e.target_step, 99) <= 5  # S1-S5
         ]
 
-        # Also check for process-level issues
+        # Also check for process-level issues.
+        # IMPORTANT: only *contradicted* evidence counts. A low-confidence
+        # `warning` (e.g. a step with minimal content) must NOT by itself
+        # trigger an unsupported-success verdict.
         process_issues = [
             e
             for e in evidence
-            if e.error_type
+            if e.status == "contradicted"
+            and e.error_type
             in (
                 ErrorType.UNJUSTIFIED_ASSUMPTION,
                 ErrorType.REASONING_GAP,

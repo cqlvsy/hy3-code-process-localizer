@@ -1,0 +1,233 @@
+[
+  {
+    "case_id": "ADV-01",
+    "category": "COMPLEXITY_MISCLAIM",
+    "flaw": "代码用双层嵌套循环（真实 O(n^2)），但 S5 声称时间复杂度 O(n)。正确答案，过程在 S5 复杂度声明处不成立。",
+    "problem": {
+      "prompt": "Given a list of integers, return True if the list contains any duplicate values, otherwise return False.",
+      "entry_point": "has_duplicate",
+      "canonical_solution": "def has_duplicate(nums):\n    for i in range(len(nums)):\n        for j in range(i + 1, len(nums)):\n            if nums[i] == nums[j]:\n                return True\n    return False"
+    },
+    "solution": {
+      "steps": [
+        {"id": "S1", "type": "requirement_understanding", "claim": "We need to determine whether any value appears more than once in the input list."},
+        {"id": "S2", "type": "constraints_and_edges", "claim": "Input may contain negatives, zeros, duplicates, and an empty list; length can be 0."},
+        {"id": "S3", "type": "algorithm_choice", "claim": "Iterate over all pairs of indices and compare their values."},
+        {"id": "S4", "type": "correctness_argument", "claim": "If any pair has equal values, a duplicate exists; otherwise the list is duplicate-free."},
+        {"id": "S5", "type": "complexity_analysis", "claim": "Time complexity is O(n) and space is O(1)."},
+        {"id": "S6", "type": "self_test_plan", "claim": "Test with [1,2,3,1], [1,2,3], [], [5,5]."},
+        {"id": "S7", "type": "code_implementation", "claim": "Implement the pairwise comparison loop."}
+      ],
+      "complexity": {"time": "O(n)", "space": "O(1)"},
+      "code": "def has_duplicate(nums):\n    for i in range(len(nums)):\n        for j in range(i + 1, len(nums)):\n            if nums[i] == nums[j]:\n                return True\n    return False"
+    },
+    "base_tests": [
+      "assert has_duplicate([1,2,3,1]) == True",
+      "assert has_duplicate([1,2,3]) == False",
+      "assert has_duplicate([]) == False",
+      "assert has_duplicate([5,5]) == True"
+    ],
+    "gold": {"final_correct": true, "process_correct": false, "first_error_step": "S5", "primary_error_type": "COMPLEXITY_MISCLAIM", "unsupported_success": true}
+  },
+  {
+    "case_id": "ADV-02",
+    "category": "REASONING_GAP_MISSING_STEP",
+    "flaw": "解题过程缺失 S4（正确性论证）。其余步骤正常、代码正确。过程在 S4 不成立，属伪成功。",
+    "problem": {
+      "prompt": "Return the maximum value in a non-empty list of integers.",
+      "entry_point": "max_val",
+      "canonical_solution": "def max_val(nums):\n    m = nums[0]\n    for x in nums:\n        if x > m:\n            m = x\n    return m"
+    },
+    "solution": {
+      "steps": [
+        {"id": "S1", "type": "requirement_understanding", "claim": "Find the largest value in a non-empty integer list."},
+        {"id": "S2", "type": "constraints_and_edges", "claim": "List is non-empty; may contain negatives and duplicates."},
+        {"id": "S3", "type": "algorithm_choice", "claim": "Initialize the maximum with the first element and scan the rest."},
+        {"id": "S5", "type": "complexity_analysis", "claim": "Time O(n), space O(1)."},
+        {"id": "S6", "type": "self_test_plan", "claim": "Test [3,1,2], [5], [-1,-2,-3]."},
+        {"id": "S7", "type": "code_implementation", "claim": "Implement the single-pass scan."}
+      ],
+      "complexity": {"time": "O(n)", "space": "O(1)"},
+      "code": "def max_val(nums):\n    m = nums[0]\n    for x in nums:\n        if x > m:\n            m = x\n    return m"
+    },
+    "base_tests": [
+      "assert max_val([3,1,2]) == 3",
+      "assert max_val([5]) == 5",
+      "assert max_val([-1,-2,-3]) == -1"
+    ],
+    "gold": {"final_correct": true, "process_correct": false, "first_error_step": "S4", "primary_error_type": "REASONING_GAP", "unsupported_success": true}
+  },
+  {
+    "case_id": "ADV-03",
+    "category": "PLAN_CODE_MISMATCH",
+    "flaw": "S3 声称用哈希表（dict）统计频次，但 S7 代码用普通循环计数（无 dict/hash），计划与实现不一致。代码正确，过程错，但不属于伪成功（错误在 S7）。",
+    "problem": {
+      "prompt": "Count how many times the value `target` appears in the list `arr`.",
+      "entry_point": "count_target",
+      "canonical_solution": "def count_target(arr, target):\n    count = 0\n    for x in arr:\n        if x == target:\n            count += 1\n    return count"
+    },
+    "solution": {
+      "steps": [
+        {"id": "S1", "type": "requirement_understanding", "claim": "Count occurrences of target in arr."},
+        {"id": "S2", "type": "constraints_and_edges", "claim": "arr may be empty; target may not appear."},
+        {"id": "S3", "type": "algorithm_choice", "claim": "Use a hash map (dict) to store frequencies of each element, then return the stored count for target."},
+        {"id": "S4", "type": "correctness_argument", "claim": "Counting every element yields the correct frequency for target."},
+        {"id": "S5", "type": "complexity_analysis", "claim": "Time O(n), space O(n) for the hash map."},
+        {"id": "S6", "type": "self_test_plan", "claim": "Test [1,2,2,3] target 2 -> 2; [] target 1 -> 0."},
+        {"id": "S7", "type": "code_implementation", "claim": "Iterate and count matches."}
+      ],
+      "complexity": {"time": "O(n)", "space": "O(1)"},
+      "code": "def count_target(arr, target):\n    return sum(1 for x in arr if x == target)"
+    },
+    "base_tests": [
+      "assert count_target([1,2,2,3], 2) == 2",
+      "assert count_target([], 1) == 0",
+      "assert count_target([5,5,5], 5) == 3"
+    ],
+    "gold": {"final_correct": true, "process_correct": false, "first_error_step": "S7", "primary_error_type": "PLAN_CODE_MISMATCH", "unsupported_success": false}
+  },
+  {
+    "case_id": "ADV-04",
+    "category": "RUNTIME_ERROR_EDGE",
+    "flaw": "代码直接索引 lst[0]，未处理空列表，触发 IndexError。最终答案错误，定位到 S7。",
+    "problem": {
+      "prompt": "Return the first element of a non-empty list.",
+      "entry_point": "first_elem",
+      "canonical_solution": "def first_elem(lst):\n    if not lst:\n        return None\n    return lst[0]"
+    },
+    "solution": {
+      "steps": [
+        {"id": "S1", "type": "requirement_understanding", "claim": "Return the first element of a list."},
+        {"id": "S2", "type": "constraints_and_edges", "claim": "List is non-empty per spec."},
+        {"id": "S3", "type": "algorithm_choice", "claim": "Index the first position."},
+        {"id": "S4", "type": "correctness_argument", "claim": "First element is at index 0."},
+        {"id": "S5", "type": "complexity_analysis", "claim": "O(1)."},
+        {"id": "S6", "type": "self_test_plan", "claim": "Test [3,4,5]."},
+        {"id": "S7", "type": "code_implementation", "claim": "Return lst[0]."}
+      ],
+      "complexity": {"time": "O(1)", "space": "O(1)"},
+      "code": "def first_elem(lst):\n    return lst[0]"
+    },
+    "base_tests": [
+      "assert first_elem([3,4,5]) == 3",
+      "assert first_elem([]) is None"
+    ],
+    "gold": {"final_correct": false, "process_correct": false, "first_error_step": "S7", "primary_error_type": "RUNTIME_ERROR", "unsupported_success": false}
+  },
+  {
+    "case_id": "ADV-05",
+    "category": "EDGE_CASE_FAILURE_ASSERT",
+    "flaw": "代码返回 max(nums) 而非 min(nums)，在常规输入上即产生错误答案（断言失败）。最终错误，定位到 S7。",
+    "problem": {
+      "prompt": "Return the minimum element of a non-empty list of integers.",
+      "entry_point": "min_val",
+      "canonical_solution": "def min_val(nums):\n    m = nums[0]\n    for x in nums:\n        if x < m:\n            m = x\n    return m"
+    },
+    "solution": {
+      "steps": [
+        {"id": "S1", "type": "requirement_understanding", "claim": "Return the smallest value in a non-empty integer list."},
+        {"id": "S2", "type": "constraints_and_edges", "claim": "Non-empty; may contain negatives and duplicates."},
+        {"id": "S3", "type": "algorithm_choice", "claim": "Scan and keep the smallest seen."},
+        {"id": "S4", "type": "correctness_argument", "claim": "Initialize with the first element, update when a smaller one is found."},
+        {"id": "S5", "type": "complexity_analysis", "claim": "O(n)."},
+        {"id": "S6", "type": "self_test_plan", "claim": "Test [3,1,2] -> 1; [5] -> 5."},
+        {"id": "S7", "type": "code_implementation", "claim": "Return the minimum."}
+      ],
+      "complexity": {"time": "O(n)", "space": "O(1)"},
+      "code": "def min_val(nums):\n    return max(nums)"
+    },
+    "base_tests": [
+      "assert min_val([3,1,2]) == 1",
+      "assert min_val([5]) == 5",
+      "assert min_val([-1,-5,-2]) == -5"
+    ],
+    "gold": {"final_correct": false, "process_correct": false, "first_error_step": "S7", "primary_error_type": "EDGE_CASE_FAILURE", "unsupported_success": false}
+  },
+  {
+    "case_id": "ADV-06",
+    "category": "NEGATIVE_CONTROL",
+    "flaw": "完整正确的解题过程与代码，无任何缺陷。应判定 final/process 均正确、无伪成功。",
+    "problem": {
+      "prompt": "Return the square of integer n.",
+      "entry_point": "square",
+      "canonical_solution": "def square(n):\n    return n * n"
+    },
+    "solution": {
+      "steps": [
+        {"id": "S1", "type": "requirement_understanding", "claim": "Compute n multiplied by itself."},
+        {"id": "S2", "type": "constraints_and_edges", "claim": "n may be negative, zero, or positive; result is always non-negative."},
+        {"id": "S3", "type": "algorithm_choice", "claim": "Use simple arithmetic multiplication."},
+        {"id": "S4", "type": "correctness_argument", "claim": "n * n equals n squared by definition."},
+        {"id": "S5", "type": "complexity_analysis", "claim": "O(1)."},
+        {"id": "S6", "type": "self_test_plan", "claim": "Test 3 -> 9, -2 -> 4, 0 -> 0."},
+        {"id": "S7", "type": "code_implementation", "claim": "Return n * n."}
+      ],
+      "complexity": {"time": "O(1)", "space": "O(1)"},
+      "code": "def square(n):\n    return n * n"
+    },
+    "base_tests": [
+      "assert square(3) == 9",
+      "assert square(-2) == 4",
+      "assert square(0) == 0"
+    ],
+    "gold": {"final_correct": true, "process_correct": true, "first_error_step": null, "primary_error_type": "UNKNOWN", "unsupported_success": false}
+  },
+  {
+    "case_id": "ADV-07",
+    "category": "NEGATIVE_CONTROL",
+    "flaw": "完整正确的解题过程与代码（含空列表边界说明）。应判定全部正确。",
+    "problem": {
+      "prompt": "Return the sum of all integers in a list. Return 0 for an empty list.",
+      "entry_point": "list_sum",
+      "canonical_solution": "def list_sum(lst):\n    return sum(lst)"
+    },
+    "solution": {
+      "steps": [
+        {"id": "S1", "type": "requirement_understanding", "claim": "Sum every integer in lst; empty list sums to 0."},
+        {"id": "S2", "type": "constraints_and_edges", "claim": "lst may be empty (returns 0), contain negatives, zeros, and duplicates."},
+        {"id": "S3", "type": "algorithm_choice", "claim": "Accumulate elements; built-in sum handles the empty case naturally."},
+        {"id": "S4", "type": "correctness_argument", "claim": "Summing all elements yields the total; sum([]) is 0 by definition."},
+        {"id": "S5", "type": "complexity_analysis", "claim": "O(n)."},
+        {"id": "S6", "type": "self_test_plan", "claim": "Test [1,2,3] -> 6, [] -> 0, [-1,1] -> 0."},
+        {"id": "S7", "type": "code_implementation", "claim": "Return sum(lst)."}
+      ],
+      "complexity": {"time": "O(n)", "space": "O(1)"},
+      "code": "def list_sum(lst):\n    return sum(lst)"
+    },
+    "base_tests": [
+      "assert list_sum([1,2,3]) == 6",
+      "assert list_sum([]) == 0",
+      "assert list_sum([-1,1]) == 0"
+    ],
+    "gold": {"final_correct": true, "process_correct": true, "first_error_step": null, "primary_error_type": "UNKNOWN", "unsupported_success": false}
+  },
+  {
+    "case_id": "ADV-08",
+    "category": "NEGATIVE_CONTROL_SOFT_WARNING",
+    "flaw": "代码正确、测试通过，但 S2 未显式提及边界关键词（仅软警告，非矛盾）。应判定 final/process 正确、无伪成功，仅产生软警告。",
+    "problem": {
+      "prompt": "Return the largest element in a non-empty list of integers.",
+      "entry_point": "largest",
+      "canonical_solution": "def largest(nums):\n    return max(nums)"
+    },
+    "solution": {
+      "steps": [
+        {"id": "S1", "type": "requirement_understanding", "claim": "Find the maximum value in the list."},
+        {"id": "S2", "type": "constraints_and_edges", "claim": "We scan the list to find the maximum."},
+        {"id": "S3", "type": "algorithm_choice", "claim": "Take the maximum over all elements."},
+        {"id": "S4", "type": "correctness_argument", "claim": "The maximum of a set is its greatest element."},
+        {"id": "S5", "type": "complexity_analysis", "claim": "O(n)."},
+        {"id": "S6", "type": "self_test_plan", "claim": "Test [3,9,1] -> 9; [5] -> 5."},
+        {"id": "S7", "type": "code_implementation", "claim": "Return the maximum."}
+      ],
+      "complexity": {"time": "O(n)", "space": "O(1)"},
+      "code": "def largest(nums):\n    return max(nums)"
+    },
+    "base_tests": [
+      "assert largest([3,9,1]) == 9",
+      "assert largest([5]) == 5",
+      "assert largest([-2,-5,-1]) == -1"
+    ],
+    "gold": {"final_correct": true, "process_correct": true, "first_error_step": null, "primary_error_type": "UNKNOWN", "unsupported_success": false}
+  }
+]

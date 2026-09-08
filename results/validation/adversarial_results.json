@@ -1,0 +1,264 @@
+{
+  "metrics": {
+    "n_cases": 8,
+    "process_error_detection_accuracy": 0.875,
+    "first_error_step_accuracy": 0.8,
+    "error_type_accuracy": 0.8,
+    "false_positive_rate": 0.0,
+    "unsupported_success_recall": 1.0,
+    "unsupported_success_precision": 1.0,
+    "breakdown": {
+      "first_error_step": {
+        "matched": 4,
+        "total": 5
+      },
+      "error_type": {
+        "matched": 4,
+        "total": 5
+      },
+      "negatives": {
+        "fp": 0,
+        "total": 3
+      }
+    }
+  },
+  "cases": [
+    {
+      "case_id": "ADV-01",
+      "category": "COMPLEXITY_MISCLAIM",
+      "flaw": "代码用双层嵌套循环（真实 O(n^2)），但 S5 声称时间复杂度 O(n)。正确答案，过程在 S5 复杂度声明处不成立。",
+      "gold": {
+        "final_correct": true,
+        "process_correct": false,
+        "first_error_step": "S5",
+        "primary_error_type": "COMPLEXITY_MISCLAIM",
+        "unsupported_success": true
+      },
+      "pred": {
+        "final_correct": true,
+        "process_correct": false,
+        "first_error_step": "S5",
+        "primary_error_type": "COMPLEXITY_MISCLAIM",
+        "unsupported_success": true
+      },
+      "evidence": [
+        {
+          "source": "static_check",
+          "status": "contradicted",
+          "target_step": "S5",
+          "error_type": "COMPLEXITY_MISCLAIM",
+          "detail": "Code has deep nesting (max indent=16) but claims time complexity O(n)"
+        }
+      ]
+    },
+    {
+      "case_id": "ADV-02",
+      "category": "REASONING_GAP_MISSING_STEP",
+      "flaw": "解题过程缺失 S4（正确性论证）。其余步骤正常、代码正确。过程在 S4 不成立，属伪成功。",
+      "gold": {
+        "final_correct": true,
+        "process_correct": false,
+        "first_error_step": "S4",
+        "primary_error_type": "REASONING_GAP",
+        "unsupported_success": true
+      },
+      "pred": {
+        "final_correct": true,
+        "process_correct": false,
+        "first_error_step": "S4",
+        "primary_error_type": "REASONING_GAP",
+        "unsupported_success": true
+      },
+      "evidence": [
+        {
+          "source": "static_check",
+          "status": "contradicted",
+          "target_step": "S4",
+          "error_type": "REASONING_GAP",
+          "detail": "Missing required step S4"
+        },
+        {
+          "source": "static_check",
+          "status": "contradicted",
+          "target_step": "S5",
+          "error_type": "COMPLEXITY_MISCLAIM",
+          "detail": "Code has deep nesting (max indent=12) but claims time complexity O(n)"
+        }
+      ]
+    },
+    {
+      "case_id": "ADV-03",
+      "category": "PLAN_CODE_MISMATCH",
+      "flaw": "S3 声称用哈希表（dict）统计频次，但 S7 代码用普通循环计数（无 dict/hash），计划与实现不一致。代码正确，过程错，但不属于伪成功（错误在 S7）。",
+      "gold": {
+        "final_correct": true,
+        "process_correct": false,
+        "first_error_step": "S7",
+        "primary_error_type": "PLAN_CODE_MISMATCH",
+        "unsupported_success": false
+      },
+      "pred": {
+        "final_correct": true,
+        "process_correct": true,
+        "first_error_step": null,
+        "primary_error_type": "UNKNOWN",
+        "unsupported_success": false
+      },
+      "evidence": []
+    },
+    {
+      "case_id": "ADV-04",
+      "category": "RUNTIME_ERROR_EDGE",
+      "flaw": "代码直接索引 lst[0]，未处理空列表，触发 IndexError。最终答案错误，定位到 S7。",
+      "gold": {
+        "final_correct": false,
+        "process_correct": false,
+        "first_error_step": "S7",
+        "primary_error_type": "RUNTIME_ERROR",
+        "unsupported_success": false
+      },
+      "pred": {
+        "final_correct": false,
+        "process_correct": false,
+        "first_error_step": "S7",
+        "primary_error_type": "RUNTIME_ERROR",
+        "unsupported_success": false
+      },
+      "evidence": [
+        {
+          "source": "base_test",
+          "status": "contradicted",
+          "target_step": "S7",
+          "error_type": "RUNTIME_ERROR",
+          "detail": "Base test 2 failed: IndexError: list index out of range\nTraceback (most recent call last):\n  File \"/Users/cq/WorkBuddy/2026-09-07-12-24-04/src/hcp_eval/executio"
+        },
+        {
+          "source": "static_check",
+          "status": "warning",
+          "target_step": "S5",
+          "error_type": "REASONING_GAP",
+          "detail": "Step S5 has minimal content (5 chars)"
+        }
+      ]
+    },
+    {
+      "case_id": "ADV-05",
+      "category": "EDGE_CASE_FAILURE_ASSERT",
+      "flaw": "代码返回 max(nums) 而非 min(nums)，在常规输入上即产生错误答案（断言失败）。最终错误，定位到 S7。",
+      "gold": {
+        "final_correct": false,
+        "process_correct": false,
+        "first_error_step": "S7",
+        "primary_error_type": "EDGE_CASE_FAILURE",
+        "unsupported_success": false
+      },
+      "pred": {
+        "final_correct": false,
+        "process_correct": false,
+        "first_error_step": "S7",
+        "primary_error_type": "EDGE_CASE_FAILURE",
+        "unsupported_success": false
+      },
+      "evidence": [
+        {
+          "source": "base_test",
+          "status": "contradicted",
+          "target_step": "S7",
+          "error_type": "EDGE_CASE_FAILURE",
+          "detail": "Base test 1 failed: Assertion failed: "
+        },
+        {
+          "source": "static_check",
+          "status": "warning",
+          "target_step": "S5",
+          "error_type": "REASONING_GAP",
+          "detail": "Step S5 has minimal content (5 chars)"
+        }
+      ]
+    },
+    {
+      "case_id": "ADV-06",
+      "category": "NEGATIVE_CONTROL",
+      "flaw": "完整正确的解题过程与代码，无任何缺陷。应判定 final/process 均正确、无伪成功。",
+      "gold": {
+        "final_correct": true,
+        "process_correct": true,
+        "first_error_step": null,
+        "primary_error_type": "UNKNOWN",
+        "unsupported_success": false
+      },
+      "pred": {
+        "final_correct": true,
+        "process_correct": true,
+        "first_error_step": null,
+        "primary_error_type": "UNKNOWN",
+        "unsupported_success": false
+      },
+      "evidence": [
+        {
+          "source": "static_check",
+          "status": "warning",
+          "target_step": "S5",
+          "error_type": "REASONING_GAP",
+          "detail": "Step S5 has minimal content (5 chars)"
+        }
+      ]
+    },
+    {
+      "case_id": "ADV-07",
+      "category": "NEGATIVE_CONTROL",
+      "flaw": "完整正确的解题过程与代码（含空列表边界说明）。应判定全部正确。",
+      "gold": {
+        "final_correct": true,
+        "process_correct": true,
+        "first_error_step": null,
+        "primary_error_type": "UNKNOWN",
+        "unsupported_success": false
+      },
+      "pred": {
+        "final_correct": true,
+        "process_correct": true,
+        "first_error_step": null,
+        "primary_error_type": "UNKNOWN",
+        "unsupported_success": false
+      },
+      "evidence": [
+        {
+          "source": "static_check",
+          "status": "warning",
+          "target_step": "S5",
+          "error_type": "REASONING_GAP",
+          "detail": "Step S5 has minimal content (5 chars)"
+        }
+      ]
+    },
+    {
+      "case_id": "ADV-08",
+      "category": "NEGATIVE_CONTROL_SOFT_WARNING",
+      "flaw": "代码正确、测试通过，但 S2 未显式提及边界关键词（仅软警告，非矛盾）。应判定 final/process 正确、无伪成功，仅产生软警告。",
+      "gold": {
+        "final_correct": true,
+        "process_correct": true,
+        "first_error_step": null,
+        "primary_error_type": "UNKNOWN",
+        "unsupported_success": false
+      },
+      "pred": {
+        "final_correct": true,
+        "process_correct": true,
+        "first_error_step": null,
+        "primary_error_type": "UNKNOWN",
+        "unsupported_success": false
+      },
+      "evidence": [
+        {
+          "source": "static_check",
+          "status": "warning",
+          "target_step": "S5",
+          "error_type": "REASONING_GAP",
+          "detail": "Step S5 has minimal content (5 chars)"
+        }
+      ]
+    }
+  ]
+}

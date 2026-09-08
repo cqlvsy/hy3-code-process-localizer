@@ -77,9 +77,18 @@ venv.bak/
 Thumbs.db
 
 # Project-specific
+# Raw imported EvalPlus samples (large, reproducible from official API) stay ignored,
+# but the small hand-built controlled validation set IS part of the methodology.
 data/*.jsonl
 !data/.gitkeep
-results/*
+!data/adversarial_set.json
+# Raw experiment outputs (jsonl/csv/log) stay local; reports (md) and summary
+# metrics (json) are deliverables and are tracked.
+results/*.jsonl
+results/*.csv
+results/*.log
+results/**/*.jsonl
+results/**/*.csv
 !results/.gitkeep
 *.coverage
 coverage.xml
