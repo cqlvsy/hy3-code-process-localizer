@@ -127,9 +127,8 @@ lines.append("- `localization_accuracy` / `error_type_accuracy` / `false_positiv
 lines.append("  EvalPlus 数据集**没有过程级金标准标注**，无法自动计算定位准确率等需要 ground-truth 的指标；")
 lines.append("  本报告的过程准确率依据本系统自有的 S1–S7 规则 / 静态检查 rubric 判定。")
 lines.append("- **§12.3 金标准由 agent 标注**，非独立人工核验；验证集偏向『正确解』，更硬的对抗测试见 §12.4。")
-lines.append("- **检查器版本不一致（重要）**：MBPP+ 100 题使用**修复后**的 `rule_checker`（已修复复杂度缩进误报、"
-             "计划-代码裸关键词误报）真实重跑；HumanEval+ 30 题因 TokenHub 免费额度在复跑时耗尽（HTTP 402），"
-             "仍保留**修复前**检查器产出的真实生成结果，其过程指标含已知误报、被低估。建议额度恢复后用修复后检查器复跑 HumanEval+。")
+lines.append("- **检查器版本一致**：MBPP+ 100 题与 HumanEval+ 30 题均使用**修复后**的 `rule_checker`"
+             "（已修复复杂度缩进误报、计划-代码裸关键词误报）真实重跑；§12.3/§12.4 验证指标在修复后复验保持不变。")
 lines.append("- 样本量 MBPP+ 100 / HumanEval+ 30，结论为初步趋势，扩大样本可提升稳定性。")
 lines.append("")
 lines.append("---")

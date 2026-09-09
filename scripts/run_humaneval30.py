@@ -44,6 +44,8 @@ def main() -> None:
             logger.info("Backed up pre-existing jsonl -> %s", bak)
 
     localizer = ErrorLocalizer(timeout=settings.execution_timeout)
+    settings.hy3_request_timeout = 180
+    settings.hy3_max_retries = 8
     hy3 = Hy3Client(settings)
 
     done: set[str] = set()
@@ -60,7 +62,7 @@ def main() -> None:
                 logger.warning("Skipping unparseable line: %s", exc)
     logger.info("Resuming: %d already done", len(done))
 
-    def gen_with_retry(problem, attempts: int = 4):
+    def gen_with_retry(problem, attempts: int = 8):
         last = None
         for a in range(attempts):
             try:
@@ -68,15 +70,17 @@ def main() -> None:
                     problem.prompt, problem.entry_point, task_id=problem.task_id
                 )
                 if sol.parse_error:
-                    logger.warning("[%s] parse error -> fallback canonical", problem.task_id)
-                    sol.code = problem.canonical_solution
+                    logger.warning("[%s] parse error (attempt %d), retrying", problem.task_id, a + 1)
+                    last = ValueError("parse_error")
+                    time.sleep(2 * (a + 1))
+                    continue
                 return sol
             except Exception as exc:  # noqa: BLE001
                 last = exc
                 logger.warning("[%s] gen attempt %d failed: %s", problem.task_id, a + 1, exc)
                 time.sleep(3 * (a + 1))
-        logger.error("[%s] all gen attempts failed -> canonical", problem.task_id)
-        return SolutionRecord(task_id=problem.task_id, code=problem.canonical_solution)
+        logger.error("[%s] all gen attempts failed -> SKIP (will resume later)", problem.task_id)
+        return None
 
     total = len(problems)
     for i, problem in enumerate(problems):
@@ -85,6 +89,9 @@ def main() -> None:
         logger.info("[%d/%d] %s", i + 1, total, problem.task_id)
         t0 = time.monotonic()
         solution = gen_with_retry(problem)
+        if solution is None:
+            logger.warning("[%s] generation failed, skipping (not written)", problem.task_id)
+            continue
         try:
             result = localizer.evaluate(problem, solution, collect_coverage_data=True)
         except Exception as exc:  # noqa: BLE001

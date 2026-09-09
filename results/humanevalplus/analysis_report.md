@@ -1,6 +1,6 @@
 # Hy3 Code Process Evaluation - Analysis Report
 
-**Generated:** 2026-09-09T06:58:09.320742+00:00
+**Generated:** 2026-09-09T08:52:08.423383+00:00
 **Dataset:** humanevalplus
 **Model:** hy3
 **Sample Size:** 30
@@ -15,54 +15,48 @@
 | Final Accuracy | 100.00% |
 | Base Pass Rate | 100.00% |
 | Plus Pass Rate | 100.00% |
-| Process Accuracy | 36.67% |
-| Unsupported Success Count | 17 |
-| Unsupported Success Rate | 56.67% |
+| Process Accuracy | 73.33% |
+| Unsupported Success Count | 2 |
+| Unsupported Success Rate | 6.67% |
 
 ## 2. Error Type Distribution
 
 | Error Type | Count | Percentage |
 |------------|-------|------------|
-| `COMPLEXITY_MISCLAIM` | 13 | 43.3% |
-| `UNKNOWN` | 11 | 36.7% |
-| `REASONING_GAP` | 4 | 13.3% |
-| `PLAN_CODE_MISMATCH` | 2 | 6.7% |
+| `UNKNOWN` | 22 | 73.3% |
+| `PLAN_CODE_MISMATCH` | 6 | 20.0% |
+| `COMPLEXITY_MISCLAIM` | 2 | 6.7% |
 
 ## 3. Difficulty Breakdown
 
 ### Medium (n=30)
 
 - Final Accuracy: **100.00%**
-- Process Accuracy: **36.67%**
+- Process Accuracy: **73.33%**
 - Common Errors:
-  - `COMPLEXITY_MISCLAIM`: 13 occurrences
-  - `UNKNOWN`: 11 occurrences
-  - `REASONING_GAP`: 4 occurrences
+  - `UNKNOWN`: 22 occurrences
+  - `PLAN_CODE_MISMATCH`: 6 occurrences
+  - `COMPLEXITY_MISCLAIM`: 2 occurrences
 
 ## 5. First Error Step Distribution
 
 | Step | Name | Count |
 |-------|------|-------|
-| S1 | Requirement Understanding | 4 |
-| S5 | Complexity Analysis | 13 |
-| S7 | Code Implementation | 2 |
+| S5 | Complexity Analysis | 2 |
+| S7 | Code Implementation | 6 |
 
 ## 6. Typical Case Analysis
 
 ### Cases with Unsupported Success (Correct Answer, Wrong Process)
 
 - **HumanEval/6**: Error at `S5`, type=`COMPLEXITY_MISCLAIM`
-- **HumanEval/26**: Error at `S5`, type=`COMPLEXITY_MISCLAIM`
-- **HumanEval/139**: Error at `S5`, type=`COMPLEXITY_MISCLAIM`
-- **HumanEval/22**: Error at `S1`, type=`REASONING_GAP`
-- **HumanEval/151**: Error at `S5`, type=`COMPLEXITY_MISCLAIM`
+- **HumanEval/87**: Error at `S5`, type=`COMPLEXITY_MISCLAIM`
 
 ## 7. Model Capability Boundary Analysis
 
 ### Observed Failure Patterns
 
-- **Correct-by-coincidence**: 19 solutions produce correct answers through flawed reasoning processes.
-- **Understanding-level errors**: 4 errors originate at S1 (requirement understanding) or S2 (constraints), indicating potential issues with problem comprehension.
+- **Correct-by-coincidence**: 8 solutions produce correct answers through flawed reasoning processes.
 
 ---
 
