@@ -87,19 +87,19 @@ def main():
     lines = ["# §12.3 过程定位验证集 (Process-Localization Validation)\n",
              "> 金标准由 agent 对 13 道真实 Hy3 输出逐题标注（非独立人类核验，详见正文说明）。\n",
              "## 总体指标\n",
-             f"- 样本数 N = **{n}** (干净 {sum(1 for _,g,p in rows if g['process_correct'])} / 伪成功候选 {sum(1 for _,g,p in rows if g['unsupported_success'])} / 真错 {sum(1 for _,g,p in rows if not g['final_correct'])})",
+             f"- 样本数 N = **{n}** (干净 {sum(1 for _,g,p in rows if g['process_correct'])} / 伪成功候选 {sum(1 for _,g,p in rows if g['unsupported_success'])} / 真错 {sum(1 for _,g,p in rows if not p['final_correct'])})",
              f"- 过程错误检测准确率: **{proc_match}/{n} = {metrics['process_detection_accuracy']:.2%}**",
              f"- 首错步准确率: **{fes_match}/{len(fes_cases)} = {metrics['first_error_step_accuracy']:.2%}**",
              f"- 错误类型准确率: **{et_match}/{len(et_cases)} = {metrics['error_type_accuracy']:.2%}**",
              f"- 误报率 (FPR): **{fp}/{len(negatives)} = {metrics['false_positive_rate']:.2%}**",
-             f"- 伪成功召回: **{us_recall:.2%}** | 精确率: **{us_prec:.2%}**\n",
+             f"- 伪成功召回: **{us_recall:.2%}** | 精确率: **{us_prec:.2%}**\n" if us_recall is not None and us_prec is not None else "- 伪成功召回: **N/A** (金标准中无伪成功样本)\n",
              "## 逐例明细\n"]
     for d in details:
         g, p = d["gold"], d["pred"]
         verdict = "✅" if d["match"] else "❌"
         lines.append(f"- {verdict} **{d['task_id']}**  gold[proc={g['process_correct']},step={g.get('first_error_step')},type={g.get('primary_error_type')},uns={g['unsupported_success']}]  "
                      f"pred[proc={p['process_correct']},step={p['first_error_step']},type={p['primary_error_type']},uns={p['unsupported_success']}]")
-    (VAL / "validation_report.md").write_text("\n".join(lines), ensure_ascii=False)
+    (VAL / "validation_report.md").write_text("\n".join(lines))
     print(json.dumps(metrics, indent=2, ensure_ascii=False))
 
 

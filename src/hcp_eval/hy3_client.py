@@ -89,17 +89,38 @@ class Hy3Client:
         return self._generate_openai(system_prompt, user_prompt, temperature, max_tokens)
 
     def _generate_openai(self, system_prompt, user_prompt, temperature, max_tokens) -> str:
-        response = self._openai.chat.completions.create(
-            model=self.settings.hy3_model,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            temperature=temperature or self.settings.hy3_temperature,
-            max_tokens=max_tokens or self.settings.hy3_max_tokens,
-            extra_body={"reasoning_effort": self.settings.hy3_reasoning_effort},
-        )
-        return response.choices[0].message.content or ""
+        import httpx  # type: ignore
+
+        last_err: Exception | None = None
+        for attempt in range(self.settings.hy3_max_retries + 1):
+            try:
+                response = self._openai.chat.completions.create(
+                    model=self.settings.hy3_model,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt},
+                    ],
+                    temperature=temperature or self.settings.hy3_temperature,
+                    max_tokens=max_tokens or self.settings.hy3_max_tokens,
+                    extra_body={"reasoning_effort": self.settings.hy3_reasoning_effort},
+                    timeout=self.settings.hy3_request_timeout,
+                )
+                return response.choices[0].message.content or ""
+            except (httpx.TimeoutException, httpx.HTTPStatusError, Exception) as e:  # noqa: BLE001
+                last_err = e
+                if attempt < self.settings.hy3_max_retries:
+                    # Exponential backoff for rate limits / transient errors.
+                    sleep_s = min(2 ** attempt, 30)
+                    logger.warning(
+                        "Hy3 OpenAI call attempt %d failed (%s); retrying in %.0fs",
+                        attempt + 1, type(e).__name__, sleep_s,
+                    )
+                    time.sleep(sleep_s)
+                else:
+                    raise
+        # Should be unreachable; keep mypy happy.
+        assert last_err is not None
+        raise last_err
 
     def _generate_tencentcloud(self, system_prompt, user_prompt, temperature, max_tokens) -> str:
         from tencentcloud.hunyuan.v20230901 import models

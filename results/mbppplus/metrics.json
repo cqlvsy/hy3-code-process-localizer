@@ -1,0 +1,44 @@
+{
+  "total_problems": 100,
+  "final_accuracy": 0.85,
+  "base_pass_rate": 0.98,
+  "plus_pass_rate": 0.86,
+  "process_accuracy": 0.62,
+  "unsupported_success_count": 2,
+  "unsupported_success_rate": 0.02,
+  "error_type_distribution": {
+    "UNKNOWN": 62,
+    "PLAN_CODE_MISMATCH": 21,
+    "COMPLEXITY_MISCLAIM": 3,
+    "EDGE_CASE_FAILURE": 11,
+    "RUNTIME_ERROR": 3
+  },
+  "difficulty_breakdown": {
+    "medium": {
+      "count": 100,
+      "final_accuracy": 0.85,
+      "process_accuracy": 0.62,
+      "common_errors": [
+        {
+          "error_type": "UNKNOWN",
+          "count": 62
+        },
+        {
+          "error_type": "PLAN_CODE_MISMATCH",
+          "count": 21
+        },
+        {
+          "error_type": "EDGE_CASE_FAILURE",
+          "count": 11
+        }
+      ]
+    }
+  },
+  "localization_accuracy": null,
+  "false_positive_rate": null,
+  "error_type_accuracy": null,
+  "dataset_name": "mbppplus",
+  "sample_size": 100,
+  "model_name": "hy3",
+  "timestamp": "2026-09-08T14:08:00.306599+00:00"
+}

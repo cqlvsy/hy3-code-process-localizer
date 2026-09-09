@@ -1,0 +1,23 @@
+{
+  "n": 13,
+  "process_detection_accuracy": 1.0,
+  "first_error_step_accuracy": 1.0,
+  "error_type_accuracy": 1.0,
+  "false_positive_rate": 0.0,
+  "unsupported_success_recall": null,
+  "unsupported_success_precision": null,
+  "breakdown": {
+    "first_error_step": {
+      "matched": 2,
+      "total": 2
+    },
+    "error_type": {
+      "matched": 2,
+      "total": 2
+    },
+    "negatives": {
+      "fp": 0,
+      "total": 11
+    }
+  }
+}

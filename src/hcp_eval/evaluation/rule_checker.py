@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import ast
 import logging
 import re
+import textwrap
 from typing import Any, Optional
 
 from ..schemas import (
@@ -95,31 +97,44 @@ class RuleChecker:
         return None
 
     def check_complexity_consistency(self, solution: SolutionRecord) -> list[EvidenceRecord]:
-        """Check if claimed complexity is consistent with code patterns."""
+        """Check if claimed complexity is consistent with code patterns.
+
+        Uses AST-based loop-nesting analysis instead of a naive indentation
+        heuristic: a single loop (depth 1) is fully consistent with an O(n)
+        claim, while *nested* loops (depth >= 2) contradict a sub-quadratic
+        claim such as O(n) or O(1). Plain indentation depth is never treated
+        as evidence on its own.
+        """
         evidence = []
-        code = solution.code.lower()
         claimed_time = solution.complexity.time.lower()
 
-        # Heuristic: nested loops suggest O(n^2) or worse
-        nested_loop_count = code.count("for ") + code.count("while ")
-        # Rough heuristic - count indentation levels suggesting nesting
-        lines = solution.code.splitlines()
-        max_indent = 0
-        for line in lines:
-            stripped = line.lstrip()
-            if stripped:
-                indent = len(line) - len(stripped)
-                max_indent = max(max_indent, indent)
+        # Only challenge claims that are (at most) sub-quadratic.
+        sub_quadratic = any(
+            tok in claimed_time
+            for tok in ["o(1)", "o(log", "o(n)", "o(n log"]
+        )
+        if not sub_quadratic:
+            return evidence
 
-        # Very rough heuristic: 8+ spaces of max nesting suggests O(n^2)
-        if max_indent >= 8 and ("o(n)" in claimed_time or "o(1)" in claimed_time):
+        # Parse code; fall back to no flag if it does not parse.
+        try:
+            tree = ast.parse(textwrap.dedent(solution.code))
+        except SyntaxError:
+            return evidence
+
+        max_loop_depth = self._max_loop_depth(tree)
+
+        # Nested loops (depth >= 2) imply O(n^2) or worse, contradicting an
+        # O(n) / O(1) claim. A single loop is fine.
+        if max_loop_depth >= 2:
             evidence.append(
                 EvidenceRecord(
                     source="static_check",
                     status="contradicted",
                     detail=(
-                        f"Code has deep nesting (max indent={max_indent}) but "
-                        f"claims time complexity {solution.complexity.time}"
+                        f"Code contains nested loops (depth={max_loop_depth}) but "
+                        f"claims time complexity {solution.complexity.time}, which is "
+                        f"sub-quadratic"
                     ),
                     target_step="S5",
                     error_type=ErrorType.COMPLEXITY_MISCLAIM,
@@ -129,60 +144,122 @@ class RuleChecker:
 
         return evidence
 
+    @staticmethod
+    def _max_loop_depth(node: ast.AST, depth: int = 0) -> int:
+        """Return the maximum nesting depth of loops within *node*."""
+        best = depth
+        for child in ast.iter_child_nodes(node):
+            if isinstance(child, (ast.For, ast.AsyncFor, ast.While)):
+                best = max(best, RuleChecker._max_loop_depth(child, depth + 1))
+            else:
+                best = max(best, RuleChecker._max_loop_depth(child, depth))
+        return best
+
     def check_plan_code_alignment(self, solution: SolutionRecord) -> list[EvidenceRecord]:
-        """Check if the algorithm described in S3 matches the implementation in S7."""
+        """Check if the algorithm described in S3 matches the implementation in S7.
+
+        Algorithm mentions are detected from S3 prose with *word-safe* keyword
+        matching (so e.g. "formula for" or "for exact" does not trip the
+        "iteration" detector), and confirmed against actual code constructs via
+        AST where possible.
+        """
         evidence = []
 
-        # Get S3 (algorithm choice) and S7 (code) content
         s3_step = next((s for s in solution.steps if s.id == "S3"), None)
         if not s3_step:
             return evidence
 
-        s3_claim = s3_step.claim.lower()
+        s3 = s3_step.claim.lower()
         code = solution.code.lower()
 
-        # Check for common algorithm keywords in both
         algo_keywords = {
-            "recursion": ["recursive", "recurse", "base case"],
-            "iteration": ["loop", "for ", "while ", "iterate"],
-            "dynamic programming": ["dp", "memo", "cache", "dynamic programming"],
-            "greedy": ["greedy", "sort first", "take local optimum"],
-            "divide and conquer": ["divide", "conquer", "merge", "split"],
-            "hash": ["hash", "dict", "set", "map"],
-            "two pointer": ["two pointer", "left.*right", "start.*end"],
-            "binary search": ["binary search", "mid", "low.*high"],
+            "recursion": ["recursive", "recurse", "recursion"],
+            "iteration": ["iterative", "iteration", "loop", "while loop", "for loop", "iterate"],
+            "dynamic programming": ["dynamic programming", " memo", " memoiz", "cache"],
+            "greedy": ["greedy"],
+            "divide and conquer": ["divide and conquer", "mergesort", "merge sort"],
+            "hash": ["hash", "hashmap", "dictionary", " hashset"],
+            "two pointer": ["two pointer", "two-pointer", "two pointers"],
+            "binary search": ["binary search", "bisect"],
             "sorting": ["sort(", ".sort", "sorted("],
-            "backtracking": ["backtrack", "prune", "dfs"],
+            "backtracking": ["backtrack", "depth-first", " dfs"],
         }
 
-        mentioned_algos = []
-        for algo, keywords in algo_keywords.items():
-            if any(kw in s3_claim for kw in keywords):
-                mentioned_algos.append(algo)
+        # Negation-aware mention detection: a keyword such as "iteration" inside a
+        # negated phrase like "without manual iteration" / "no loop" must NOT be
+        # treated as the solution *planning* to use that construct.
+        negation_near = re.compile(r"\b(without|no|not|avoid|instead of)\b", re.IGNORECASE)
 
-        # Verify at least one mentioned algorithm appears in code
-        if mentioned_algos:
-            found_in_code = False
-            for algo in mentioned_algos:
-                keywords = algo_keywords.get(algo, [])
-                if any(kw in code for kw in keywords):
-                    found_in_code = True
+        def mentioned(keywords: list[str]) -> bool:
+            for kw in keywords:
+                idx = s3.find(kw)
+                while idx != -1:
+                    before = s3[max(0, idx - 25):idx]
+                    if not negation_near.search(before):
+                        return True
+                    idx = s3.find(kw, idx + 1)
+            return False
+
+        mentioned_algos = [a for a, kws in algo_keywords.items() if mentioned(kws)]
+        if not mentioned_algos:
+            return evidence
+
+        # Confirm via code constructs (AST-based where possible).
+        try:
+            tree = ast.parse(textwrap.dedent(solution.code))
+        except SyntaxError:
+            return evidence
+        has_loop = any(
+            isinstance(n, (ast.For, ast.AsyncFor, ast.While)) for n in ast.walk(tree)
+        )
+        has_sort = ("sorted(" in code) or (".sort(" in code)
+        func_names = [n.name for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)]
+        has_recursion = any(
+            isinstance(c, ast.Call)
+            and isinstance(c.func, ast.Name)
+            and c.func.id in func_names
+            for c in ast.walk(tree)
+        )
+
+        found = False
+        for algo in mentioned_algos:
+            if algo == "iteration" and has_loop:
+                found = True
+                break
+            if algo == "recursion" and has_recursion:
+                found = True
+                break
+            if algo == "sorting" and has_sort:
+                found = True
+                break
+            if algo in (
+                "dynamic programming",
+                "greedy",
+                "divide and conquer",
+                "hash",
+                "two pointer",
+                "binary search",
+                "backtracking",
+            ):
+                kws = algo_keywords[algo]
+                if any(kw.strip() and kw in code for kw in kws):
+                    found = True
                     break
 
-            if not found_in_code:
-                evidence.append(
-                    EvidenceRecord(
-                        source="static_check",
-                        status="contradicted",
-                        detail=(
-                            f"S3 mentions algorithms [{', '.join(mentioned_algos)}] "
-                            f"but code does not show clear implementation of any of them"
-                        ),
-                        target_step="S7",
-                        error_type=ErrorType.PLAN_CODE_MISMATCH,
-                        confidence=0.65,
-                    )
+        if not found:
+            evidence.append(
+                EvidenceRecord(
+                    source="static_check",
+                    status="contradicted",
+                    detail=(
+                        f"S3 mentions algorithms [{', '.join(mentioned_algos)}] "
+                        f"but code does not show clear implementation of any of them"
+                    ),
+                    target_step="S7",
+                    error_type=ErrorType.PLAN_CODE_MISMATCH,
+                    confidence=0.65,
                 )
+            )
 
         return evidence
 

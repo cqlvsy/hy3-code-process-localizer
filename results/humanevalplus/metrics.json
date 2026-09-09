@@ -1,0 +1,43 @@
+{
+  "total_problems": 30,
+  "final_accuracy": 1.0,
+  "base_pass_rate": 1.0,
+  "plus_pass_rate": 1.0,
+  "process_accuracy": 0.3667,
+  "unsupported_success_count": 17,
+  "unsupported_success_rate": 0.5667,
+  "error_type_distribution": {
+    "UNKNOWN": 11,
+    "COMPLEXITY_MISCLAIM": 13,
+    "PLAN_CODE_MISMATCH": 2,
+    "REASONING_GAP": 4
+  },
+  "difficulty_breakdown": {
+    "medium": {
+      "count": 30,
+      "final_accuracy": 1.0,
+      "process_accuracy": 0.3667,
+      "common_errors": [
+        {
+          "error_type": "COMPLEXITY_MISCLAIM",
+          "count": 13
+        },
+        {
+          "error_type": "UNKNOWN",
+          "count": 11
+        },
+        {
+          "error_type": "REASONING_GAP",
+          "count": 4
+        }
+      ]
+    }
+  },
+  "localization_accuracy": null,
+  "false_positive_rate": null,
+  "error_type_accuracy": null,
+  "dataset_name": "humanevalplus",
+  "sample_size": 30,
+  "model_name": "hy3",
+  "timestamp": "2026-09-09T06:58:09.320742+00:00"
+}

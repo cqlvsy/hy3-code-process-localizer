@@ -90,6 +90,16 @@ results/*.log
 results/**/*.jsonl
 results/**/*.csv
 !results/.gitkeep
+# intermediate / backup artifacts (NOT deliverables)
+results/**/*_backup/
+results/smoke/
+results/validation/_review_dump.txt
+results/validation/*.log
+# root-level transient summary files (superseded by per-dataset + combined reports)
+results/metrics.json
+results/analysis_report.md
+# validation intermediate (final gold standard lives in gold_annotations.json)
+results/validation/annotation_sheet.json
 *.coverage
 coverage.xml
 htmlcov/

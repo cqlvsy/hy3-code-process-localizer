@@ -56,6 +56,16 @@ class Settings(BaseSettings):
         ge=1,
         description="Request timeout in seconds",
     )
+    hy3_request_timeout: float = Field(
+        default=120.0,
+        ge=1.0,
+        description="Per-request timeout (seconds) passed to the OpenAI-compatible client",
+    )
+    hy3_max_retries: int = Field(
+        default=4,
+        ge=0,
+        description="Number of retry attempts on transient API errors (rate limits, timeouts)",
+    )
 
     # Dataset Configuration
     dataset_name: str = Field(
