@@ -88,8 +88,8 @@ EvalPlus MBPP+ / HumanEval+
 
 ## 环境要求
 
-- Python >= 3.10
-- Hy3 模型服务（vLLM 或 SGLang 部署，提供 OpenAI-compatible API）
+- Python >= 3.10（本项目在 3.13 验证通过）
+- Hy3 模型服务：提供 **OpenAI-compatible API**。本项目的实际运行环境为**腾讯云 TokenHub** 托管的 Hy3 推理端点（见下方配置）；也可自部署 vLLM / SGLang 后改为本地地址。
 
 ### 安装
 
@@ -111,19 +111,24 @@ cp .env.example .env
 # 编辑 .env，填入你的 Hy3 API 配置
 ```
 
-### Hy3 配置
+### Hy3 配置（本项目实际使用：腾讯云 TokenHub）
 
-编辑 `.env` 文件：
+编辑 `.env` 文件（**密钥仅本地，绝不入库**）：
 
 ```bash
-# Hy3 API 地址（OpenAI 兼容接口）
-HY3_BASE_URL=http://127.0.0.1:8000/v1
-HY3_API_KEY=your-api-key-here
+# 本地自部署（可选）
+# HY3_BASE_URL=http://127.0.0.1:8000/v1
+
+# 腾讯云 TokenHub（OpenAI 兼容，本项目实际配置）
+HY3_PROVIDER=openai
+HY3_BASE_URL=https://tokenhub.tencentmaas.com/v1
+HY3_API_KEY=<你的 TokenHub Key>
 HY3_MODEL=hy3
-HY3_REASONING_EFFORT=high
+HY3_REASONING_EFFORT=high   # low / medium / high
 ```
 
-Hy3 部署请参考：[Tencent-Hunyuan/Hy3](https://github.com/Tencent-Hunyuan/Hy3)
+- TokenHub 推理端点说明：[腾讯云 TokenHub 推理](https://console.cloud.tencent.com/tokenhub/inference)
+- 自部署 Hy3 参考：[Tencent-Hunyuan/Hy3](https://github.com/Tencent-Hunyuan/Hy3)
 
 ## 使用方式
 
@@ -278,3 +283,11 @@ Apache-2.0
 - [Tencent Hunyuan Hy3](https://github.com/Tencent-Hunyuan/Hy3) — 底层大语言模型
 - [EvalPlus](https://github.com/evalplus/evalplus) — 评测框架与增强数据集
 - [coverage.py](https://coverage.readthedocs.io/) — 代码覆盖率工具
+
+## 相关文档
+
+- **[方案设计文档](方案设计文档.md)** —— 系统架构、模块设计、三层定位、错误体系、验证与实验方案（推荐先读）
+- [docs/method.md](docs/method.md) —— 方法学细节
+- [docs/dataset_notes.md](docs/dataset_notes.md) —— 数据集来源与链接
+- [docs/error_taxonomy.md](docs/error_taxonomy.md) —— 错误类型体系详述
+- [results/combined_report.md](results/combined_report.md) —— 综合实验报告
