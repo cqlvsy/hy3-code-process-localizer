@@ -291,6 +291,9 @@ Apache-2.0
 - [docs/dataset_notes.md](docs/dataset_notes.md) —— 数据集来源与链接
 - [docs/error_taxonomy.md](docs/error_taxonomy.md) —— 错误类型体系详述
 - [results/combined_report.md](results/combined_report.md) —— 综合实验报告
+- [results/validation/validation_report.md](results/validation/validation_report.md) —— §12.3 过程定位验证（定位准确率 / 误报率 / 人工抽检记录）
+- [results/validation/manual_spotcheck.md](results/validation/manual_spotcheck.md) —— 人工抽检记录表（13 例，含人工确认签字栏）
+- [results/validation/adversarial_report.md](results/validation/adversarial_report.md) —— §12.4 对抗验证（含伪成功检测）
 
 ## Demo 演示
 
