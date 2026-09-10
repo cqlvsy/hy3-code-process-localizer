@@ -291,3 +291,16 @@ Apache-2.0
 - [docs/dataset_notes.md](docs/dataset_notes.md) —— 数据集来源与链接
 - [docs/error_taxonomy.md](docs/error_taxonomy.md) —— 错误类型体系详述
 - [results/combined_report.md](results/combined_report.md) —— 综合实验报告
+
+## Demo 演示
+
+下面是一段约 17 秒的演示动画，展示本系统对一道真实题目（Mbpp/771，括号匹配 checker）的完整处理流程：
+
+![Hy3 代码过程评估 Demo](demo/process_eval_demo.gif)
+
+> 流程概览：题目输入 → S1–S7 推理步骤 → 模型自报复杂度 → 生成代码 → 过程评估（rule_checker + plus 边界测试）→ 定位到 S7 的 `EDGE_CASE_FAILURE` → 评估结论。
+> 该示例说明：仅靠基准测试通过无法发现的边界缺陷，被过程评估在步骤级定位出来。
+>
+> 注：GitHub 上 GIF 会自动循环播放；若在你的查看器里不动，点开图片或下载到本地即可看到动画。
+
+交互式 Demo 见 [demo/app.py](demo/app.py)，需 `pip install streamlit` 后运行。
