@@ -78,11 +78,13 @@ class EvalPlusAdapter(BaseAdapter):
                         except Exception as e:
                             logger.warning("Skipping malformed line: %s", e)
             self._problems = problems
+            self._assign_difficulty_labels(self._problems)
             return problems
 
         # Fall back to official evalplus API
         problems = self._load_from_evalplus()
         self._problems = problems
+        self._assign_difficulty_labels(self._problems)
         logger.info("Loaded %d problems from %s", len(problems), self.dataset_name)
         return problems
 
@@ -114,11 +116,12 @@ class EvalPlusAdapter(BaseAdapter):
         base_tests, plus_tests, oracle_code = self._build_tests(rec, entry_point, canonical_solution)
 
         clauses = self._extract_clauses(rec.get("prompt", ""), entry_point)
+        difficulty = "medium"  # placeholder; _assign_difficulty_labels overwrites by percentile
 
         return ProblemSpec(
             task_id=task_id,
             dataset=self.dataset_name,
-            difficulty="medium",
+            difficulty=difficulty,
             prompt=rec.get("prompt", ""),
             entry_point=entry_point,
             canonical_solution=canonical_solution,
@@ -173,6 +176,60 @@ class EvalPlusAdapter(BaseAdapter):
                 )
 
         return base_tests, plus_tests, oracle_code
+
+    # ------------------------------------------------------------------ #
+    # Difficulty heuristic
+    # ------------------------------------------------------------------ #
+
+    @staticmethod
+    def _compute_difficulty(
+        rec: dict, base_tests: list[str], plus_tests: list[str], canonical_solution: str
+    ) -> float:
+        """Return a raw difficulty score (higher = harder)."""
+        n_plus = len(plus_tests)
+        prompt_len = len(rec.get("prompt", ""))
+        solution_lines = len(canonical_solution.splitlines())
+
+        plus_score = min(1.0, n_plus / 20.0)
+        prompt_score = min(1.0, prompt_len / 500.0)
+        solution_score = min(1.0, solution_lines / 30.0)
+
+        return 0.50 * plus_score + 0.25 * prompt_score + 0.25 * solution_score
+
+    @staticmethod
+    def _assign_difficulty_labels(problems: list) -> None:
+        """Assign easy/medium/hard labels by intra-dataset score percentiles.
+
+        Guarantees a three-tier distribution even when features are uniform
+        (e.g. MBPP+ samples with no plus tests).
+        """
+        if not problems:
+            return
+        # Compute raw score for each problem using proxy signals.
+        scored = []
+        for i, p in enumerate(problems):
+            plen = len(p.prompt)
+            slen = len(p.canonical_solution.splitlines())
+            n_plus = len(p.plus_tests)
+            s = (
+                0.50 * min(1.0, n_plus / 20.0)
+                + 0.25 * min(1.0, plen / 500.0)
+                + 0.25 * min(1.0, slen / 30.0)
+            )
+            scored.append((s, i))
+
+        scored.sort(key=lambda x: x[0])
+        n = len(scored)
+        t1 = n // 3
+        t2 = 2 * n // 3
+
+        for rank, (s, idx) in enumerate(scored):
+            if rank < t1:
+                problems[idx].difficulty = "easy"
+            elif rank < t2:
+                problems[idx].difficulty = "medium"
+            else:
+                problems[idx].difficulty = "hard"
 
     def _extract_clauses(self, prompt: str, entry_point: str) -> list[Clause]:
         clauses = []

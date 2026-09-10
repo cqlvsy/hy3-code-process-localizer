@@ -12,21 +12,51 @@
     "COMPLEXITY_MISCLAIM": 2
   },
   "difficulty_breakdown": {
-    "medium": {
-      "count": 30,
+    "easy": {
+      "count": 10,
       "final_accuracy": 1.0,
-      "process_accuracy": 0.7333,
+      "process_accuracy": 0.7,
       "common_errors": [
         {
           "error_type": "UNKNOWN",
-          "count": 22
+          "count": 7
         },
         {
           "error_type": "PLAN_CODE_MISMATCH",
-          "count": 6
+          "count": 3
+        }
+      ]
+    },
+    "hard": {
+      "count": 10,
+      "final_accuracy": 1.0,
+      "process_accuracy": 0.7,
+      "common_errors": [
+        {
+          "error_type": "UNKNOWN",
+          "count": 7
         },
         {
           "error_type": "COMPLEXITY_MISCLAIM",
+          "count": 2
+        },
+        {
+          "error_type": "PLAN_CODE_MISMATCH",
+          "count": 1
+        }
+      ]
+    },
+    "medium": {
+      "count": 10,
+      "final_accuracy": 1.0,
+      "process_accuracy": 0.8,
+      "common_errors": [
+        {
+          "error_type": "UNKNOWN",
+          "count": 8
+        },
+        {
+          "error_type": "PLAN_CODE_MISMATCH",
           "count": 2
         }
       ]
@@ -38,5 +68,5 @@
   "dataset_name": "humanevalplus",
   "sample_size": 30,
   "model_name": "hy3",
-  "timestamp": "2026-09-09T08:52:08.423383+00:00"
+  "timestamp": "2026-09-10T08:21:58.284282+00:00"
 }

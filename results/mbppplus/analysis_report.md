@@ -1,6 +1,6 @@
 # Hy3 Code Process Evaluation - Analysis Report
 
-**Generated:** 2026-09-08T14:08:00.306599+00:00
+**Generated:** 2026-09-10T08:21:58.277941+00:00
 **Dataset:** mbppplus
 **Model:** hy3
 **Sample Size:** 100
@@ -31,14 +31,32 @@
 
 ## 3. Difficulty Breakdown
 
-### Medium (n=100)
+### Easy (n=33)
 
-- Final Accuracy: **85.00%**
-- Process Accuracy: **62.00%**
+- Final Accuracy: **90.91%**
+- Process Accuracy: **66.67%**
 - Common Errors:
-  - `UNKNOWN`: 62 occurrences
-  - `PLAN_CODE_MISMATCH`: 21 occurrences
-  - `EDGE_CASE_FAILURE`: 11 occurrences
+  - `UNKNOWN`: 22 occurrences
+  - `PLAN_CODE_MISMATCH`: 8 occurrences
+  - `EDGE_CASE_FAILURE`: 3 occurrences
+
+### Hard (n=34)
+
+- Final Accuracy: **82.35%**
+- Process Accuracy: **67.65%**
+- Common Errors:
+  - `UNKNOWN`: 23 occurrences
+  - `PLAN_CODE_MISMATCH`: 5 occurrences
+  - `EDGE_CASE_FAILURE`: 4 occurrences
+
+### Medium (n=33)
+
+- Final Accuracy: **81.82%**
+- Process Accuracy: **51.52%**
+- Common Errors:
+  - `UNKNOWN`: 17 occurrences
+  - `PLAN_CODE_MISMATCH`: 8 occurrences
+  - `EDGE_CASE_FAILURE`: 4 occurrences
 
 ## 5. First Error Step Distribution
 

@@ -48,7 +48,9 @@ class MetricsCalculator:
             error_dist[et] = error_dist.get(et, 0) + 1
 
         # Difficulty breakdown
-        difficulty_breakdown = self._compute_difficulty_breakdown(results)
+        difficulty_breakdown = self._compute_difficulty_breakdown(
+            results, difficulty_map=kwargs.get("difficulty_map")
+        )
 
         # Per-step error distribution
         step_error_dist: dict[str, int] = {}
@@ -75,13 +77,15 @@ class MetricsCalculator:
         )
 
     def _compute_difficulty_breakdown(
-        self, results: list[EvaluationResult]
+        self, results: list[EvaluationResult], difficulty_map: dict[str, str] | None = None
     ) -> dict[str, dict[str, Any]]:
         """Break down results by difficulty level."""
         by_difficulty: dict[str, list[EvaluationResult]] = {}
         for r in results:
-            # Try to get difficulty from metadata or default to medium
-            diff = getattr(r, "difficulty", "medium")
+            if difficulty_map:
+                diff = difficulty_map.get(r.task_id, "medium")
+            else:
+                diff = getattr(r, "difficulty", "medium")
             if diff not in by_difficulty:
                 by_difficulty[diff] = []
             by_difficulty[diff].append(r)

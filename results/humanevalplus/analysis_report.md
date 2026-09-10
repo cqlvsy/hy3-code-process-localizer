@@ -1,6 +1,6 @@
 # Hy3 Code Process Evaluation - Analysis Report
 
-**Generated:** 2026-09-09T08:52:08.423383+00:00
+**Generated:** 2026-09-10T08:21:58.284282+00:00
 **Dataset:** humanevalplus
 **Model:** hy3
 **Sample Size:** 30
@@ -29,14 +29,30 @@
 
 ## 3. Difficulty Breakdown
 
-### Medium (n=30)
+### Easy (n=10)
 
 - Final Accuracy: **100.00%**
-- Process Accuracy: **73.33%**
+- Process Accuracy: **70.00%**
 - Common Errors:
-  - `UNKNOWN`: 22 occurrences
-  - `PLAN_CODE_MISMATCH`: 6 occurrences
+  - `UNKNOWN`: 7 occurrences
+  - `PLAN_CODE_MISMATCH`: 3 occurrences
+
+### Hard (n=10)
+
+- Final Accuracy: **100.00%**
+- Process Accuracy: **70.00%**
+- Common Errors:
+  - `UNKNOWN`: 7 occurrences
   - `COMPLEXITY_MISCLAIM`: 2 occurrences
+  - `PLAN_CODE_MISMATCH`: 1 occurrences
+
+### Medium (n=10)
+
+- Final Accuracy: **100.00%**
+- Process Accuracy: **80.00%**
+- Common Errors:
+  - `UNKNOWN`: 8 occurrences
+  - `PLAN_CODE_MISMATCH`: 2 occurrences
 
 ## 5. First Error Step Distribution
 

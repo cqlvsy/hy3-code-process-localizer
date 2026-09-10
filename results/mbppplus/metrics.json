@@ -14,22 +14,60 @@
     "RUNTIME_ERROR": 3
   },
   "difficulty_breakdown": {
-    "medium": {
-      "count": 100,
-      "final_accuracy": 0.85,
-      "process_accuracy": 0.62,
+    "easy": {
+      "count": 33,
+      "final_accuracy": 0.9091,
+      "process_accuracy": 0.6667,
       "common_errors": [
         {
           "error_type": "UNKNOWN",
-          "count": 62
+          "count": 22
         },
         {
           "error_type": "PLAN_CODE_MISMATCH",
-          "count": 21
+          "count": 8
         },
         {
           "error_type": "EDGE_CASE_FAILURE",
-          "count": 11
+          "count": 3
+        }
+      ]
+    },
+    "hard": {
+      "count": 34,
+      "final_accuracy": 0.8235,
+      "process_accuracy": 0.6765,
+      "common_errors": [
+        {
+          "error_type": "UNKNOWN",
+          "count": 23
+        },
+        {
+          "error_type": "PLAN_CODE_MISMATCH",
+          "count": 5
+        },
+        {
+          "error_type": "EDGE_CASE_FAILURE",
+          "count": 4
+        }
+      ]
+    },
+    "medium": {
+      "count": 33,
+      "final_accuracy": 0.8182,
+      "process_accuracy": 0.5152,
+      "common_errors": [
+        {
+          "error_type": "UNKNOWN",
+          "count": 17
+        },
+        {
+          "error_type": "PLAN_CODE_MISMATCH",
+          "count": 8
+        },
+        {
+          "error_type": "EDGE_CASE_FAILURE",
+          "count": 4
         }
       ]
     }
@@ -40,5 +78,5 @@
   "dataset_name": "mbppplus",
   "sample_size": 100,
   "model_name": "hy3",
-  "timestamp": "2026-09-08T14:08:00.306599+00:00"
+  "timestamp": "2026-09-10T08:21:58.277941+00:00"
 }
